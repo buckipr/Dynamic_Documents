@@ -1,25 +1,90 @@
 ---
 title: "R Markdown Example of MS Word"
 author: "Jason Thomas"
-date: "9/4/2019"
+date: "01/08/2020"
 output: word_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+# set default value for code chunks to print the code (along with the 
+# output) in the MS Word document
+opts_chunk$set(echo = TRUE)
 ```
+
+# Markdown
+
+Surround text with two asterisks, \*\*like this\*\*, to make
+text **bold**.  Use a single asterisk, \*like this\*, to put
+text in *italics*.  Here is a nested list (indentation is used
+for sub-levels):
+
+* Point A
+  + A.1
+    - A.1.1
+	- A.1.2
+	  * A.1.2.1
+  + A.2
+* Point B
+
+You can include footnotes.^[To format footnotes (e.g., set the font size) you
+probably have to use a template.  [Here](https://rmarkdown.rstudio.com/articles_docx.html) is 
+an example.]  If you want use a `font that looks like computer code`^[I think it is called 
+`Consolas` in MS Word.], surround your text with back ticks, i.e.,  \`like this\`.
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+R Markdown is a special type of markdown that weaves R output directly into
+the final document.  Here is an example.  
 
 ```{r cars}
 summary(cars)
 ```
 
-## Including Plots
+We can also include R output in a line.  For example, the third observation
+of the speed variable is `r cars$speed[3]`.  Now we will replace it with a random
+value
+
+```{r cars2}
+cars$speed[3] <- rnorm(1)
+cars$speed[3]
+```
+
+and show that it has changed to `r cars$speed[3]`.
+
+# Tables
+```{r table}
+# create table from iris data set (150 observations of plant species
+# with variables sepal length and width, and pedal length and names.
+names(iris)
+table(iris$Species)
+
+# create a matrix of means
+tab1 <- aggregate(. ~ Species, data = iris, FUN = mean)
+specieNames <- gsub("\\.", " ", names(iris))
+
+# use kable() to format the table
+kable(tab1, digits = 2, col.names = specieNames, align = c('l', rep('c', 4)),
+      caption = "Table 1: Variable means for iris data.")
+```
+
+[This link](https://www.rdocumentation.org/packages/knitr/versions/1.26/topics/kable)
+contains the help file for the `kable()` function.  
+
+
+
+## Example with [kableExtra](https://cran.r-project.org/package=kableExtra)
+
+Another useful R package is [kableExtra](https://cran.r-project.org/package=kableExtra).
+
+
+## Example with [stargazer](https://cran.r-project.org/package=stargazer)
+
+If you are interested in make tables for your regression models, take a
+look at the R package [stargazer](https://cran.r-project.org/package=stargazer).
+
+
+# Including Plots
 
 You can also embed plots, for example:
 
@@ -28,3 +93,4 @@ plot(pressure)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+

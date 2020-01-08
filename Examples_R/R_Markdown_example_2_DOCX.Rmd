@@ -1,0 +1,53 @@
+---
+title: "Title"
+subtitle: "subtitle"
+author:
+  - name: "JT"
+    affiliation: "1"
+  - name: "JR"
+    affiliation: "1"
+affiliation:
+  - id: "1"
+    institution: "Test"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  word_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+# set default value for code chunks to print the code (along with the 
+# output) in the MS Word document
+opts_chunk$set(echo = TRUE)
+```
+
+# YAML
+
+Note, when using the table of contents options (`toc: yes`), MS Word
+will produce a little window with the following message
+
+> This document contains fields that may refer to other 
+> files. Do you want to update the fields in the 
+> document?
+
+I always click `Yes` (if you choose `No`, your document will contain
+the text Table of Contents, but the table will be blank).
+
+* Include title with multiple lines (and formatting)
+* Table of contents
+* Multiple authors with institutional affiliations:
+[check this out](https://stackoverflow.com/questions/52918716/authors-and-affiliations-in-the-yaml-of-rmarkdown)
+
+
+# R Markdown
+
+Include code chunks from external .R files.
+
+# Equations
+
+$e^{i + \pi}$
+
+# References
+
+What is the best way to do this?
