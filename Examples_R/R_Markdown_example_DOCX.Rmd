@@ -1,15 +1,60 @@
 ---
 title: "R Markdown Example of MS Word"
 author: "Jason Thomas"
-date: "01/08/2020"
+date: "01/14/2020"
 output: word_document
 ---
 
 ```{r setup, include=FALSE}
 library(knitr)
-# set default value for code chunks to print the code (along with the 
-# output) in the MS Word document
-opts_chunk$set(echo = TRUE)
+library(summarytools)
+library(furniture)
+# set default value for code chunks to print the code (along with the output) 
+# in the MS Word document
+opts_chunk$set(comment = NA, echo = TRUE, results = "asis")
+st_options(plain.ascii = FALSE, style = "rmarkdown",
+           display.labels = FALSE, headings = FALSE)
+regTab <- function(..., digits = 3) {
+
+    modelsList <- list(...)
+    rndCoef <- digits - 1
+    # include check to ensure modelsList consists of "lm" objects
+
+    nModels <- length(modelsList)
+    nTerms <- lapply(modelsList, function(x) length(x$coef))
+    modelOrder <- order(unlist(nTerms))
+    modelMaxTerms <- which.max(nTerms)
+    termsNames <- names(modelsList[[modelMaxTerms]]$coef)
+
+    coefList <- lapply(modelsList,
+                       function(x) format(coef(x), digits = rndCoef))
+
+    coefList <- lapply(coefList, function(x) x[termsNames])
+    coefMatrix <- matrix(unlist(coefList), ncol = nModels)
+    coefMatrix <- coefMatrix[, modelOrder]
+    coefMatrix[is.na(coefMatrix)] <- ""
+
+    # add (formatted) row and column names
+    termsNames <- gsub("\\(Intercept\\)", "intercept", termsNames)
+    termsNames <- gsub("factor\\(([A-z]+)\\)([0-9]+)",
+                       "\\1:\\2", termsNames)
+    rownames(coefMatrix) <- termsNames
+    colnames(coefMatrix) <- paste0("**Model ", 1:nModels, "**")
+
+    return(coefMatrix)
+}
+```
+
+# Introduction
+
+This document shows how to use R Markdown to generate an MS Word document.
+First, you will need to install pandoc, which can be downloaded at
+[https://pandoc.org/installing.html](https://pandoc.org/installing.html).
+Several R packages are also needed to create the final .docx file.  They
+can be installed by running the following code in R Studio:
+
+```{r install packages, eval = FALSE}
+install.packages(c('rmarkdown', 'summarytools', 'furniture'))
 ```
 
 # Markdown
@@ -27,23 +72,43 @@ for sub-levels):
   + A.2
 * Point B
 
+    
+
 You can include footnotes.^[To format footnotes (e.g., set the font size) you
 probably have to use a template.  [Here](https://rmarkdown.rstudio.com/articles_docx.html) is 
 an example.]  If you want use a `font that looks like computer code`^[I think it is called 
-`Consolas` in MS Word.], surround your text with back ticks, i.e.,  \`like this\`.
+`Consolas` in MS Word.], surround your text with back ticks, i.e.,  \`like this\`.  Finally,
+if you want to insert a new line, simply include `\` at the end of the line, as I do here \
+and you can see that this second sentence fragment is on a new line \
+and this third section is also on a new line.
 
+
+    
 ## R Markdown
+    
 
 R Markdown is a special type of markdown that weaves R output directly into
-the final document.  Here is an example.  
+the final document.^[More specifically, it actually call on another R package,
+knitr, to incorporate the R output.]  Use code chunks to include R output, which are created
+using three back ticks and some options surrounded by curly braces, like this:
+
+\`\`\`{r cars}
+
+summary(cars)
+         
+\`\`\`
+
+This r code chunk (labeled cars) produces the following output in the MS Word document:
 
 ```{r cars}
 summary(cars)
 ```
 
-We can also include R output in a line.  For example, the third observation
-of the speed variable is `r cars$speed[3]`.  Now we will replace it with a random
-value
+Note that each code chunk must have a unique name (or R will complain about 
+'duplicate labels') and the document will fail to compile.  We can also 
+include R output in a line.  For example, the third observation of the 
+speed variable is `r cars$speed[3]`.  Now we will replace it with a 
+random value
 
 ```{r cars2}
 cars$speed[3] <- rnorm(1)
@@ -52,8 +117,91 @@ cars$speed[3]
 
 and show that it has changed to `r cars$speed[3]`.
 
+
+    
 # Tables
-```{r table}
+    
+
+There are several options.  The first is to use markdown syntax, but this is tedious and
+only practical for very basic tables.  R packages, e.g.,
+[summarytools](https://cran.r-project.org/package=summarytools) and 
+[furniture](https://cran.r-project.org/package=furniture) are quite useful for making
+tables, as illustrated below.
+
+\
+
+## Markdown syntax
+
+\
+\
+\
+
+| Col 1 | *Col 2* | **Column 3**|
+|-------|:-------:|------------:|
+| left justified | center |  right justified  |
+
+\
+\
+\
+\
+or something like this
+\
+\
+\
+\
+    
+**Countries**   **Visited**     **Good Football team?**
+-------------   -----------     ----------------------
+G. Britain      Yes             Sometimes :)
+India           Yes             No Asian Cup trophies yet
+Zambia          Not yet         1 Cup of Nations Title 
+
+
+\
+
+    
+But this is a pain!
+
+
+\
+
+
+## R packages
+
+
+\
+    
+
+This section includes examples with [kable](https://www.rdocumentation.org/packages/knitr/versions/1.26/topics/kable), 
+and [furniture](https://cran.r-project.org/package=furniture).  
+
+
+\
+
+
+There are some other options as well (but I think `kable()` and the furniture tools are best for MS Word)
+
+* [summarytools](https://cran.r-project.org/package=summarytools) 
+[(vignette)](https://cran.r-project.org/web/packages/summarytools/vignettes/Recommendations-rmarkdown.html)
+* [pander](https://cran.r-project.org/package=pander)
+[(vignette)](http://rapporter.github.io/pander/knitr.html)
+
+
+\
+
+
+### *Example with kable*
+    
+
+\
+
+
+This examples uses the Iris dataset that is included with the base installation of R.
+
+
+\
+
+```{r table1}
 # create table from iris data set (150 observations of plant species
 # with variables sepal length and width, and pedal length and names.
 names(iris)
@@ -68,23 +216,99 @@ kable(tab1, digits = 2, col.names = specieNames, align = c('l', rep('c', 4)),
       caption = "Table 1: Variable means for iris data.")
 ```
 
+
+\
+
 [This link](https://www.rdocumentation.org/packages/knitr/versions/1.26/topics/kable)
 contains the help file for the `kable()` function.  
 
+    
+\
 
 
-## Example with [kableExtra](https://cran.r-project.org/package=kableExtra)
-
-Another useful R package is [kableExtra](https://cran.r-project.org/package=kableExtra).
+### *Example with furniture*
 
 
-## Example with [stargazer](https://cran.r-project.org/package=stargazer)
-
-If you are interested in make tables for your regression models, take a
-look at the R package [stargazer](https://cran.r-project.org/package=stargazer).
+\
 
 
+First, we'll create a table of descriptive statistics using
+`table1()`
+
+
+\
+
+
+```{r descriptives furniture ex1}
+table1(mtcars, type = c("simple", "condensed"),
+       output = "pandoc")
+```
+
+
+\
+
+
+Another example, but for a subset of variables and different
+summary functions.
+
+
+\
+
+
+```{r descriptives furniture ex2}
+vNames <- c("Miles per gallon", "Number of cylinders",
+            "Gross horsepower")
+table1(mtcars, mpg, cyl, hp, var_names = vNames,
+       caption = "**Means and SD for subset of variables**",
+       type = c("simple", "condensed"),
+       output = "pandoc")
+```
+
+
+\
+
+
+```{r descriptives furniture ex3}
+vNames <- c("Miles per gallon", "Number of cylinders",
+            "Gross horsepower")
+table1(mtcars, mpg, cyl, hp, var_names = vNames,
+       splitby = ~am,
+       caption = "**Means and SD for subset of variables**",
+       type = c("simple", "condensed"),
+       output = "pandoc")
+```
+
+
+\
+
+
+```{r cross tab tableX}
+crossTab <- tableX(mtcars, cyl, am, type = "count")
+kable(crossTab)
+```
+
+
+\
+
+
+### *Example with regression tables*
+    
+
+```{r regression table}
+model1 <- lm(mpg ~ hp, data = mtcars)
+model2 <- lm(mpg ~ hp + drat, data = mtcars)
+model3 <- lm(mpg ~ hp + drat + factor(gear), data = mtcars)
+tab2 <- regTab(model1, model2, model3)
+kable(tab2, align = c('l', rep('c', 3)))
+```
+
+    
+    
+
+
+    
 # Including Plots
+    
 
 You can also embed plots, for example:
 
