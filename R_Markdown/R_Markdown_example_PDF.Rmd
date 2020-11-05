@@ -126,7 +126,7 @@ kable(tab1, caption  = "Descriptive Statistics")
 
 
 This is *much* easier with the [stargazer](https://cran.r-project.org/web/packages/stargazer/index.html) (which
-has a usefule [vignette](https://cran.r-project.org/web/packages/stargazer/vignettes/stargazer.pdf)).  
+has a useful [vignette](https://cran.r-project.org/web/packages/stargazer/vignettes/stargazer.pdf)).  
 
 ```{r tab2, results="asis"}
 library(stargazer)
