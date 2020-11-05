@@ -25,7 +25,7 @@ library(knitr) ## need for include_graphics()
 
 # Contents
 
-This R Markdown file contains a brief overview of R Markdown files and
+This R Markdown file (.Rmd) contains a brief overview of R Markdown files and
 exmples of:
 
 * basic markdown
@@ -36,6 +36,12 @@ exmples of:
 * including figures (and references, e.g. "In Figure X, we see...")
 * including tables (and references, e.g., "Results are shown in Table X...")
 * cross-references for sections (with links)
+
+*Brief note:* This file actually uses the R package `bookdown` (as opposed
+to the `rmarkdown` package) which provides a few more bells and whistles,
+particularly for creating academic articles.  For more details, check out the
+[The Definitive Guide](https://bookdown.org/yihui/rmarkdown/bookdown-markdown.html#bookdown-markdown).
+
 
 # Brief Overview
 
@@ -145,6 +151,3 @@ stargazer(mod1, mod2, header = FALSE, type = "latex")
 We need to label the section.  For example, remember the earlier section Code Chunks?  Here
 is a link to [Code Chunks]
 
-## Let's add a link {#add_link}
-
-Text, text, text, blah, blah, blah...
